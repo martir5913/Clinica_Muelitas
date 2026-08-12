@@ -5,7 +5,7 @@
 *Paciente
 *Dentista
 *Citas
-*Tratamientos
+*Tratamientos (Lista de sericios que ofrece la clinica)
 
 ### CRUD
 
