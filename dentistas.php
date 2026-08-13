@@ -23,8 +23,29 @@ $dentistas = $stmt->fetchAll();
                 <p>Aún no hay dentistas registrados.</p>
             </div>
         <?php else:  ?>
-            <div class="placeholder-card">
-                <p>Mensaje de prueba si cargo correctamente doctores.</p>
+            <div class="tabble-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Especialidad</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($dentistas as $dentista): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($dentista['nombre'] . ' ' . $dentista['apellido'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?php echo htmlspecialchars($dentista['especialidad'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?php echo htmlspecialchars($dentista['telefono'] ?: '—', ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?php echo htmlspecialchars($dentista['correo'] ?: '—', ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?php echo $dentista['activo'] ? 'Activo' : 'Inactivo'; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         <?php endif; ?>
     </div>
