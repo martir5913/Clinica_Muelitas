@@ -1,13 +1,14 @@
 <?php
 // Configuración de la conexión a MySQL usando PDO
-$host     = 'localhost';
+$host     = 'mysql_database';
+$port     = 3306;
 $dbName   = 'muelitas';
 $username = 'root';
-$password = ''; // Vacío por defecto en XAMPP o bien contraseña segun sea el caso.
+$password = 'root_password'; // Vacío por defecto en XAMPP o bien contraseña segun sea el caso.
 $charset  = 'utf8mb4';
 
-// Configurar DSN (Data Source Name)
-$dsn = "mysql:host=$host;dbname=$dbName;charset=$charset";
+// Configurar DSN (Data Source Name) con el puerto específico
+$dsn = "mysql:host=$host;port=$port;dbname=$dbName;charset=$charset";
 
 // Opciones de configuración de PDO para mayor seguridad y control de errores
 $options = [
