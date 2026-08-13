@@ -91,7 +91,54 @@ $dentistas = $stmt->fetchAll();
         <?php endif; ?>
         
         <!-- Formulario para crear dentistas -->
+        <div class="form-section">
+            <div class="form-section-badge">Nuevo Registro</div>
+            <h3 class="form-section-title">Registrar Dentista</h3>
 
+            <form method="POST" action="dentistas.php" class="form-grid">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control"
+                           value="<?php echo htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?>"
+                           placeholder="Ej. José" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" class="form-control"
+                           value="<?php echo htmlspecialchars($apellido, ENT_QUOTES, 'UTF-8'); ?>"
+                           placeholder="Ej. Méndez" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="especialidad">Especialidad</label>
+                    <select id="especialidad" name="especialidad" class="form-control" required>
+                        <option value="">Seleccione una especialidad</option>
+                        <?php foreach ($especialidades as $op): ?>
+                            <option value="<?php echo $op; ?>" <?php echo ($especialidad === $op) ? 'selected' : ''; ?>><?php echo $op; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" id="telefono" name="telefono" class="form-control"
+                           value="<?php echo htmlspecialchars($telefono, ENT_QUOTES, 'UTF-8'); ?>"
+                           placeholder="Ej. +502 5555-5555">
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" class="form-control"
+                           value="<?php echo htmlspecialchars($correo, ENT_QUOTES, 'UTF-8'); ?>"
+                           placeholder="correo@ejemplo.com">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar Dentista</button>
+                </div>
+            </form>
+        </div>
 
         <!-- Lista de dentistas -->
         <?php if (count($dentistas) === 0): ?>
