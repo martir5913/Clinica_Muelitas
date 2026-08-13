@@ -24,6 +24,9 @@ if (!isset($year)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($projectName, ENT_QUOTES, 'UTF-8'); ?></title>
     <link rel="stylesheet" href="styles.css">
+    <?php if ($extraStyles !== ''): ?>
+        <link rel="stylesheet" href="<?php echo htmlspecialchars($extraStyles, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php endif; ?>
 </head>
 
 <body>
