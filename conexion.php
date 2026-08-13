@@ -19,10 +19,9 @@ $options = [
 try {
     // Establecer la conexión
     $pdo = new PDO($dsn, $username, $password, $options);
-    
+
     // Opcional: Descomentar la siguiente línea durante pruebas de depuración
     // echo "Conexión a la base de datos establecida con éxito.";
-} catch (\PDOException $e) {   
+} catch (\PDOException $e) {
     die("Error de conexión en la base de datos: " . $e->getMessage());
 }
-?>
