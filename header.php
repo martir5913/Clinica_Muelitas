@@ -15,6 +15,9 @@ if (!isset($address)) {
 if (!isset($year)) {
     $year        = date('Y');
 }
+if (!isset($extraStyles)) {
+    $extraStyles = '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
