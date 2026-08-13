@@ -1,7 +1,7 @@
 <?php
 // Configuración de variables globales
 $projectName = 'Clinica Dental — Muelitas';
-$phone       = '+502 2525-6789';
+$phone       = '+502 0000-0000';
 $email       = 'info@muelitas.com';
 $address     = 'Guatemala, Guatemala';
 $year        = date('Y');
