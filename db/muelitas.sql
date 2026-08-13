@@ -67,3 +67,32 @@ CREATE TABLE tratamientos (
 		ON DELETE RESTRICT,
 	INDEX idx_tratamientos_id_cita (id_cita)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- Datos de ejemplo
+INSERT INTO pacientes (nombre, apellido, telefono, correo, fecha_nacimiento, direccion, activo) VALUES
+	('Ana', 'Pérez', '55511101', 'ana.perez@email.com', '1990-05-12', 'Calle Primera 1, Guatemala', 1),
+	('Luis', 'García', '55511102', 'luis.garcia@email.com', '1988-09-21', 'Avenida Central 10, Guatemala', 1),
+	('María', 'López', '55511103', 'maria.lopez@email.com', '1995-02-14', 'Zona 4, Guatemala', 1),
+	('Carlos', 'Martínez', '55511104', 'carlos.martinez@email.com', '1983-11-09', 'Colonia San José 8, Guatemala', 1),
+	('Sofía', 'Ramírez', '55511105', 'sofia.ramirez@email.com', '2001-07-03', 'Boulevard Norte 22, Guatemala', 1);
+
+INSERT INTO dentistas (nombre, apellido, especialidad, telefono, correo, activo) VALUES
+	('José', 'Méndez', 'General', '55522201', 'jose.mendez@email.com', 1),
+	('Patricia', 'Castro', 'Ortodoncia', '55522202', 'patricia.castro@email.com', 1),
+	('Roberto', 'Véliz', 'Endodoncia', '55522203', 'roberto.veliz@email.com', 1),
+	('Andrea', 'Núñez', 'Pediatria', '55522204', 'andrea.nunez@email.com', 1),
+	('Miguel', 'Torres', 'Cirugia', '55522205', 'miguel.torres@email.com', 1);
+
+INSERT INTO citas (fecha_hora, motivo, estado, id_paciente, id_dentista) VALUES
+	('2026-08-11 09:00:00', 'Consulta general', 'Confirmada', 1, 1),
+	('2026-08-11 10:30:00', 'Ajuste de ortodoncia', 'Pendiente', 2, 2),
+	('2026-08-11 12:00:00', 'Dolor de muela', 'Confirmada', 3, 3),
+	('2026-08-12 08:15:00', 'Revisión infantil', 'Pendiente', 4, 4),
+	('2026-08-12 15:45:00', 'Extracción', 'Cancelada', 5, 5);
+
+INSERT INTO tratamientos (nombre_tratamiento, descripcion, costo, id_cita) VALUES
+	('Limpieza dental', 'Limpieza profunda y revisión general', 250.00, 1),
+	('Ajuste de brackets', 'Corrección de alineación y tensión', 800.00, 2),
+	('Endodoncia', 'Tratamiento de conducto radicular', 1200.00, 3),
+	('Revisión pediátrica', 'Control y seguimiento del paciente infantil', 180.00, 4),
+	('Extracción simple', 'Extracción de pieza dental molar', 350.00, 5);
