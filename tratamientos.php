@@ -12,19 +12,6 @@ include 'header.php';
             <p class="module-subtitle">Administre la lista de tratamientos dentales ofrecidos (Limpieza, Brackets, Extracciones, etc.), descripciones y costos clínicos.</p>
         </header>
 
-<?php
-// Módulo: Tratamientos
-$projectName = 'Clinica Dental — Muelitas';
-include 'header.php';
-?>
-
-<main class="site-main">
-    <div class="module-container">
-        <header class="module-header">
-            <div class="module-badge">Módulo Activo</div>
-            <h2 class="module-title">Catálogo de Servicios y Tratamientos</h2>
-            <p class="module-subtitle">Administre la lista de tratamientos dentales ofrecidos (Limpieza, Brackets, Extracciones, etc.), descripciones y costos clínicos.</p>
-        </header>
 <body>
 
     <main class="page-container">
@@ -40,7 +27,7 @@ include 'header.php';
 
                 <div>
                     <span class="form-subtitle">
-                        Clínica Muelitas
+                        Clínica Dental Muelitas
                     </span>
 
                     <h1>
@@ -49,7 +36,7 @@ include 'header.php';
 
                     <p>
                         Ingresa la información del tratamiento realizado
-                        durante la cita del paciente
+                        durante la cita del paciente.
                     </p>
                 </div>
 
@@ -185,6 +172,12 @@ include 'header.php';
                     </button>
 
                 </div>
+
+            </form>
+
+        </section>
+
+    </main>
         
         <div class="placeholder-card">
             <div class="placeholder-icon">
