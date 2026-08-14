@@ -214,7 +214,7 @@ $dentistas = $stmt->fetchAll();
             <div class="placeholder-card">
                 <p>Aún no hay dentistas registrados.</p>
             </div>
-        <?php else:  ?>
+        <?php else: ?>
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
@@ -224,6 +224,7 @@ $dentistas = $stmt->fetchAll();
                             <th>Teléfono</th>
                             <th>Correo</th>
                             <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -234,6 +235,12 @@ $dentistas = $stmt->fetchAll();
                             <td><?php echo htmlspecialchars($dentista['telefono'] ?: '—', ENT_QUOTES, 'UTF-8'); ?></td>
                             <td><?php echo htmlspecialchars($dentista['correo'] ?: '—', ENT_QUOTES, 'UTF-8'); ?></td>
                             <td><?php echo $dentista['activo'] ? 'Activo' : 'Inactivo'; ?></td>
+                            <td class="table-actions">
+                                <a href="dentistas.php?action=editar&id=<?php echo (int) $dentista['id_dentista']; ?>" class="btn btn-outline btn-sm">Editar</a>
+                                <?php if ($dentista['activo']): ?>
+                                    <a href="dentistas.php?action=eliminar&id=<?php echo (int) $dentista['id_dentista']; ?>" class="btn btn-outline btn-sm btn-danger">Desactivar</a>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
