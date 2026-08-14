@@ -24,7 +24,7 @@ include 'header.php';
 
             <p class="module-subtitle">
                 Registre los tratamientos realizados a los pacientes,
-                agregando su descripción, costo y la cita relacionada.
+                agregando su descripción, costo y la cita relacionada
             </p>
 
         </header>
@@ -61,7 +61,7 @@ include 'header.php';
                     </h3>
 
                     <p>
-                        Complete la información del tratamiento.
+                        Complete la información del tratamiento
                     </p>
 
                 </div>
