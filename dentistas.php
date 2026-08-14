@@ -1,19 +1,48 @@
 <?php
 // Módulo: Dentistas
+//Inicialización de sesion
+session_start();
+
 $projectName = 'Clinica Dental — Muelitas';
 $extraStyles = 'style-dentistas-module.css'; //Carga de estilos adicionales
 require_once 'conexion.php';
 
-// Lista de especialidades válidas (coincide con el ENUM de la BD)
+//Lista de especialidades válidas (coincide con el ENUM de la BD)
 $especialidades = ['General', 'Ortodoncia', 'Endodoncia', 'Cirugia', 'Pediatria', 'Periodoncia', 'Protesis'];
 
-//Variables para el formulario
-$errores      = [];
+//Detectar si se entra en modo editar (viene por GET: dentistas.php?action=editar&id=X)
+$modoEdicion = false;
+$idEditar    = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$accion = '';
+if (isset($_GET['action'])) {
+    $accion = $_GET['action'];
+}
+
+if ($accion === 'editar' && $idEditar) {
+    $modoEdicion = true;
+}
+
+//Detectar si se entra en modo eliminar (viene por GET: dentistas.php?action=eliminar&id=X)
+$modoEliminar     = false;
+$dentistaEliminar = null;
+if ($accion === 'eliminar' && $idEditar) {
+    $stmt = $pdo->prepare("SELECT * FROM dentistas WHERE id_dentista = :id");
+    $stmt->execute(['id' => $idEditar]);
+    $dentistaEliminar = $stmt->fetch();
+
+    if ($dentistaEliminar) {
+        $modoEliminar = true;
+    }
+}
+
+//Variables para el vacías por defecto.
 $nombre       = '';
 $apellido     = '';
 $especialidad = '';
 $telefono     = '';
 $correo       = '';
+$activo       = 1;
+
 
 //Procesamiento de formuario cuando lo envia el método POST, 
 //en caso de que la solicitud required de html sea burlada

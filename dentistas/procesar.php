@@ -137,6 +137,7 @@ if ($idPost) {
     header('Location: ../dentistas.php');
 }
 exit;
+
 ?>
 
 
