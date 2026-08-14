@@ -119,6 +119,9 @@ if (empty($errores)) {
     }
 }
 
+//Capturar y guardar errores
+$_SESSION['errores'] = $errores;
+
 //Si hay errores, se guardan en la sesión y se redirige de vuelta al formulario
 $_SESSION['form_data'] = [
     'id'           => $idPost,
