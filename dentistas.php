@@ -61,64 +61,32 @@ if ($modoEdicion) {
     }
 }
 
+//Gestión de errores mediante isset para evitar null si no se envian datos en el formulario
+//también se guardan mediante SESSION para que persistan al recargar la página
+$errores = [];
+if (isset($_SESSION['errores'])) {
+    $errores = $_SESSION['errores'];
+    unset($_SESSION['errores']);
+}
 
-//Procesamiento de formuario cuando lo envia el método POST, 
-//en caso de que la solicitud required de html sea burlada
-//Se valida con el operador isset() para evirar post null. 
-// y trim() para eliminar espacios en blanco al inicio y final de la cadena.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_SESSION['form_data'])) {
+    $datosGuardados = $_SESSION['form_data'];
+    unset($_SESSION['form_data']);
 
-    $nombreCrudo = '';
-    if (isset($_POST['nombre'])) {
-        $nombreCrudo = $_POST['nombre'];
-    }
-    $nombre = trim($nombreCrudo);
+    $nombre       = $datosGuardados['nombre'];
+    $apellido     = $datosGuardados['apellido'];
+    $especialidad = $datosGuardados['especialidad'];
+    $telefono     = $datosGuardados['telefono'];
+    $correo       = $datosGuardados['correo'];
+    $activo       = $datosGuardados['activo'];
 
-    $apellidoCrudo = '';
-    if (isset($_POST['apellido'])) {
-        $apellidoCrudo = $_POST['apellido'];
-    }
-    $apellido = trim($apellidoCrudo);
-
-    $especialidadCrudo = '';
-    if (isset($_POST['especialidad'])) {
-        $especialidadCrudo = $_POST['especialidad'];
-    }
-    $especialidad = trim($especialidadCrudo);
-
-    $telefonoCrudo = '';
-    if (isset($_POST['telefono'])) {
-        $telefonoCrudo = $_POST['telefono'];
-    }
-    $telefono = trim($telefonoCrudo);
-
-    $correoCrudo = '';
-    if (isset($_POST['correo'])) {
-        $correoCrudo = $_POST['correo'];
-    }
-    $correo = trim($correoCrudo);
-
-    if (empty($errores)) {
-        try {
-            $sql = "INSERT INTO dentistas (nombre, apellido, especialidad, telefono, correo, activo)
-                    VALUES (:nombre, :apellido, :especialidad, :telefono, :correo, 1)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                'nombre'       => $nombre,
-                'apellido'     => $apellido,
-                'especialidad' => $especialidad,
-                'telefono'     => $telefono !== '' ? $telefono : null,
-                'correo'       => $correo !== '' ? $correo : null,
-            ]);
-
-            // Redirigir para evitar reenvío del formulario al recargar
-            header('Location: dentistas.php?mensaje=creado');
-            exit;
-        } catch (PDOException $e) {
-            $errores[] = 'Error al guardar el dentista: ' . $e->getMessage();
-        }
+    // Si el error vino de una edición, forzamos el modo edición otra vez
+    if ($datosGuardados['id']) {
+        $modoEdicion = true;
+        $idEditar    = $datosGuardados['id'];
     }
 }
+
 
 //Mensaje de validaciones
 $mensaje = '';
