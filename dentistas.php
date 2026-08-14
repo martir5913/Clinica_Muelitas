@@ -112,8 +112,8 @@ $dentistas = $stmt->fetchAll();
             <div class="alert alert-success">Dentista registrado correctamente.</div>
         <?php elseif ($mensaje === 'editado'): ?>
             <div class="alert alert-success">Datos del dentista actualizados correctamente.</div>
-        <?php elseif ($mensaje === 'desactivado'): ?>
-            <div class="alert alert-success">Dentista desactivado correctamente.</div>
+        <?php elseif ($mensaje === 'eliminado'): ?>
+            <div class="alert alert-success">Dentista eliminado correctamente.</div>
         <?php endif; ?>
 
         <!-- Bloque de validación -->
@@ -127,18 +127,21 @@ $dentistas = $stmt->fetchAll();
             </div>
         <?php endif; ?>
 
-        <!-- Tarjeta de confirmación para desactivar -->
+        <!-- Tarjeta de confirmación para eliminar -->
         <?php if ($modoEliminar): ?>
         <div class="confirm-card">
-            <p>¿Está seguro que desea desactivar a:</p>
+            <?php /* CAMBIO: texto actualizado a "eliminar" en vez de "desactivar",
+                     ya que ahora es un borrado permanente */ ?>
+            <p>¿Está seguro que desea <strong>eliminar permanentemente</strong> a:</p>
             <p class="confirm-nombre">
                 <?php echo htmlspecialchars($dentistaEliminar['nombre'] . ' ' . $dentistaEliminar['apellido'], ENT_QUOTES, 'UTF-8'); ?>
                 — <?php echo htmlspecialchars($dentistaEliminar['especialidad'], ENT_QUOTES, 'UTF-8'); ?>
             </p>
+            <p class="confirm-warning">Esta acción no se puede deshacer. Si el dentista tiene citas registradas, el sistema no permitirá la eliminación.</p>
             <form method="POST" action="dentistas/procesar.php" class="form-actions">
                 <input type="hidden" name="confirmar_eliminar" value="<?php echo (int) $dentistaEliminar['id_dentista']; ?>">
                 <a href="dentistas.php" class="btn btn-outline">Cancelar</a>
-                <button type="submit" class="btn btn-danger">Sí, Desactivar</button>
+                <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
             </form>
         </div>
         <?php endif; ?>
@@ -236,9 +239,7 @@ $dentistas = $stmt->fetchAll();
                             <td><?php echo $dentista['activo'] ? 'Activo' : 'Inactivo'; ?></td>
                             <td class="table-actions">
                                 <a href="dentistas.php?action=editar&id=<?php echo (int) $dentista['id_dentista']; ?>" class="btn btn-outline btn-sm">Editar</a>
-                                <?php if ($dentista['activo']): ?>
-                                    <a href="dentistas.php?action=eliminar&id=<?php echo (int) $dentista['id_dentista']; ?>" class="btn btn-outline btn-sm btn-danger">Desactivar</a>
-                                <?php endif; ?>
+                                <a href="dentistas.php?action=eliminar&id=<?php echo (int) $dentista['id_dentista']; ?>" class="btn btn-outline btn-sm btn-danger">Eliminar</a>
                             </td>
                         </tr>
                         <?php endforeach; ?>

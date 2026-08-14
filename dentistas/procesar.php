@@ -13,20 +13,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 //GESTION DE ERRORES
 //** FORMULARIO ELIMINAR **//
-//Confirmación de DESACTIVAR (viene del campo oculto "confirmar_eliminar")
-//cuando se elimina un usuario
+//Confirmación de ELIMINAR (viene del campo oculto "confirmar_eliminar")
 if (isset($_POST['confirmar_eliminar'])) {
     $idAEliminar = filter_input(INPUT_POST, 'confirmar_eliminar', FILTER_VALIDATE_INT);
 
     if ($idAEliminar) {
         try {
-            $stmt = $pdo->prepare("UPDATE dentistas SET activo = 0 WHERE id_dentista = :id");
+
+            $stmt = $pdo->prepare("DELETE FROM dentistas WHERE id_dentista = :id");
             $stmt->execute(['id' => $idAEliminar]);
 
-            header('Location: ../dentistas.php?mensaje=desactivado');
+            header('Location: ../dentistas.php?mensaje=eliminado');
             exit;
         } catch (PDOException $e) {
-            $_SESSION['errores'] = ['No fue posible desactivar al dentista: ' . $e->getMessage()];
+            //En caso de que se obtenga error de integridad referencial (código 1451), 
+            // se muestra un mensaje específico (ej. el dentista tiene citas registradas y no se puede eliminar)
+            if ($e->errorInfo[1] === 1451) {
+                $_SESSION['errores'] = ['No es posible eliminar a este dentista porque tiene citas registradas en el sistema.'];
+            } else {
+                $_SESSION['errores'] = ['Error al eliminar el dentista: ' . $e->getMessage()];
+            }
             header('Location: ../dentistas.php');
             exit;
         }

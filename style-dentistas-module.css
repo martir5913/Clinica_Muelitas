@@ -148,6 +148,11 @@
     cursor: pointer;
 }
 
+/*Texto de advertencia en la confirmación de eliminación*/
+.confirm-warning {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
 /*Corrección de responsive*/
 @media (max-width: 768px) {
     .form-grid {
