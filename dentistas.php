@@ -87,12 +87,12 @@ if (isset($_SESSION['form_data'])) {
     }
 }
 
-
-//Mensaje de validaciones
+// Leer el mensaje de confirmación tras la redirección
 $mensaje = '';
 if (isset($_GET['mensaje'])) {
     $mensaje = $_GET['mensaje'];
 }
+
 
 
 include 'header.php';
