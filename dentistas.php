@@ -4,7 +4,7 @@ $projectName = 'Clinica Dental — Muelitas';
 $extraStyles = 'style-dentistas-module.css'; //Carga de estilos adicionales
 require_once 'conexion.php';
 
-//Especialidades para registrar al momento de un nuevo dentista
+// Lista de especialidades válidas (coincide con el ENUM de la BD)
 $especialidades = ['General', 'Ortodoncia', 'Endodoncia', 'Cirugia', 'Pediatria', 'Periodoncia', 'Protesis'];
 
 //Variables para el formulario
@@ -15,26 +15,41 @@ $especialidad = '';
 $telefono     = '';
 $correo       = '';
 
-//Procesamiento de formuario cuando lo envia el método POST
+//Procesamiento de formuario cuando lo envia el método POST, 
+//en caso de que la solicitud required de html sea burlada
+//Se valida con el operador isset() para evirar post null. 
+// y trim() para eliminar espacios en blanco al inicio y final de la cadena.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre       = trim($_POST['nombre'] ?? '');
-    $apellido     = trim($_POST['apellido'] ?? '');
-    $especialidad = trim($_POST['especialidad'] ?? '');
-    $telefono     = trim($_POST['telefono'] ?? '');
-    $correo       = trim($_POST['correo'] ?? '');
 
-    if ($nombre === '') {
-        $errores[] = 'El nombre es obligatorio.';
+    $nombreCrudo = '';
+    if (isset($_POST['nombre'])) {
+        $nombreCrudo = $_POST['nombre'];
     }
-    if ($apellido === '') {
-        $errores[] = 'El apellido es obligatorio.';
+    $nombre = trim($nombreCrudo);
+
+    $apellidoCrudo = '';
+    if (isset($_POST['apellido'])) {
+        $apellidoCrudo = $_POST['apellido'];
     }
-    if (!in_array($especialidad, $especialidades, true)) {
-        $errores[] = 'Seleccione una especialidad válida.';
+    $apellido = trim($apellidoCrudo);
+
+    $especialidadCrudo = '';
+    if (isset($_POST['especialidad'])) {
+        $especialidadCrudo = $_POST['especialidad'];
     }
-    if ($correo !== '' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        $errores[] = 'El correo electrónico no tiene un formato válido.';
+    $especialidad = trim($especialidadCrudo);
+
+    $telefonoCrudo = '';
+    if (isset($_POST['telefono'])) {
+        $telefonoCrudo = $_POST['telefono'];
     }
+    $telefono = trim($telefonoCrudo);
+
+    $correoCrudo = '';
+    if (isset($_POST['correo'])) {
+        $correoCrudo = $_POST['correo'];
+    }
+    $correo = trim($correoCrudo);
 
     if (empty($errores)) {
         try {
@@ -57,8 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 //Mensaje de validaciones
-$mensaje = $_GET['mensaje'] ?? '';
+$mensaje = '';
+if (isset($_GET['mensaje'])) {
+    $mensaje = $_GET['mensaje'];
+}
+
 
 include 'header.php';
 //Listado simple de dentistas
@@ -146,7 +166,7 @@ $dentistas = $stmt->fetchAll();
                 <p>Aún no hay dentistas registrados.</p>
             </div>
         <?php else:  ?>
-            <div class="tabble-wrapper">
+            <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
