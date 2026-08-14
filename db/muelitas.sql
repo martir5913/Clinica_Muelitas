@@ -9,6 +9,7 @@ USE muelitas;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS tratamientos;
+DROP TABLE IF EXISTS catalogo_tratamientos;
 DROP TABLE IF EXISTS citas;
 DROP TABLE IF EXISTS dentistas;
 DROP TABLE IF EXISTS pacientes;
@@ -55,17 +56,29 @@ CREATE TABLE citas (
 	INDEX idx_citas_id_dentista (id_dentista)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
+CREATE TABLE catalogo_tratamientos (
+	id_catalogo_tratamiento INT AUTO_INCREMENT PRIMARY KEY,
+	nombre_tratamiento VARCHAR(150) NOT NULL,
+	descripcion_estandar TEXT,
+	costo_estandar DECIMAL(10,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
 CREATE TABLE tratamientos (
 	id_tratamiento INT AUTO_INCREMENT PRIMARY KEY,
-	nombre_tratamiento VARCHAR(150) NOT NULL,
-	descripcion TEXT,
-	costo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
 	id_cita INT NOT NULL,
+	id_catalogo_trabajo INT NOT NULL, /* Para mantener consistencia con id_catalogo_tratamiento en el mapeo relacional */
+	costo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+	observaciones TEXT,
 	CONSTRAINT fk_tratamientos_citas
 		FOREIGN KEY (id_cita) REFERENCES citas (id_cita)
 		ON UPDATE CASCADE
+		ON DELETE CASCADE, /* Si se elimina una cita, se eliminan sus tratamientos realizados en cascada */
+	CONSTRAINT fk_tratamientos_catalogo
+		FOREIGN KEY (id_catalogo_trabajo) REFERENCES catalogo_tratamientos (id_catalogo_tratamiento)
+		ON UPDATE CASCADE
 		ON DELETE RESTRICT,
-	INDEX idx_tratamientos_id_cita (id_cita)
+	INDEX idx_tratamientos_id_cita (id_cita),
+	INDEX idx_tratamientos_id_catalogo (id_catalogo_trabajo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- Datos de ejemplo
@@ -90,9 +103,16 @@ INSERT INTO citas (fecha_hora, motivo, estado, id_paciente, id_dentista) VALUES
 	('2026-08-12 08:15:00', 'Revisión infantil', 'Pendiente', 4, 4),
 	('2026-08-12 15:45:00', 'Extracción', 'Cancelada', 5, 5);
 
-INSERT INTO tratamientos (nombre_tratamiento, descripcion, costo, id_cita) VALUES
-	('Limpieza dental', 'Limpieza profunda y revisión general', 250.00, 1),
-	('Ajuste de brackets', 'Corrección de alineación y tensión', 800.00, 2),
-	('Endodoncia', 'Tratamiento de conducto radicular', 1200.00, 3),
-	('Revisión pediátrica', 'Control y seguimiento del paciente infantil', 180.00, 4),
-	('Extracción simple', 'Extracción de pieza dental molar', 350.00, 5);
+INSERT INTO catalogo_tratamientos (nombre_tratamiento, descripcion_estandar, costo_estandar) VALUES
+	('Limpieza dental', 'Limpieza profiláctica profunda y aplicación de flúor.', 250.00),
+	('Ajuste de brackets', 'Control mensual de ortodoncia, cambio de ligas y ajuste de arco.', 800.00),
+	('Endodoncia', 'Tratamiento de conductos radiculares para salvar la pieza dental.', 1200.00),
+	('Revisión pediátrica', 'Control y seguimiento del paciente infantil.', 180.00),
+	('Extracción simple', 'Extracción quirúrgica simple de pieza dental molar.', 350.00);
+
+INSERT INTO tratamientos (id_cita, id_catalogo_trabajo, costo, observaciones) VALUES
+	(1, 1, 250.00, 'Paciente con excelente higiene dental. Se recomienda control en 6 meses.'),
+	(2, 2, 800.00, 'Se cambiaron ligas a color azul y se ajustó el arco superior.'),
+	(3, 3, 1200.00, 'Se realizó la obturación del conducto radicular de la pieza 14.'),
+	(4, 4, 180.00, 'Paciente cooperador. Se le enseña técnica de cepillado.'),
+	(5, 5, 350.00, 'Extracción exitosa del molar inferior derecho. Se recetaron analgésicos.');

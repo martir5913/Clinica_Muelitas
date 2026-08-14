@@ -1,0 +1,181 @@
+/*CSS extra a utilizar en el módulo "tratamientos"*/
+
+/* Tarjeta del Formulario */
+.treatment-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.treatment-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+}
+
+.treatment-icon {
+    width: 44px;
+    height: 44px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.treatment-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.treatment-card-header h3 {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.treatment-card-header p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+/* Formulario */
+.treatment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* Campo de moneda (Quetzales) */
+.input-money {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.input-money .form-control {
+    padding-left: 32px;
+}
+
+.input-money .currency {
+    position: absolute;
+    left: 12px;
+    font-family: var(--font-title);
+    font-weight: 600;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+/* Info Box */
+.treatment-info {
+    display: flex;
+    gap: 12px;
+    background-color: rgba(2, 132, 199, 0.04);
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 0.9rem;
+    align-items: flex-start;
+}
+
+.treatment-info p {
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.info-icon {
+    color: var(--primary);
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.info-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* Panel de Base de Datos */
+.database-info {
+    background-color: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+}
+
+.database-info h3 {
+    font-family: var(--font-title);
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-size: 1.25rem;
+}
+
+.database-info p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.fields-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.field-item strong {
+    font-family: monospace;
+    color: var(--primary-dark);
+}
+
+.field-item span {
+    font-family: monospace;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .treatment-card, .database-info {
+        padding: 24px;
+    }
+}

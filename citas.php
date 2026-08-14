@@ -4,17 +4,6 @@ $projectName = 'Clinica Dental — Muelitas';
 include 'header.php';
 require_once 'conexion.php';
 
-// Asegurar que todas las citas existentes tengan un registro de tratamiento asociado (para el INNER JOIN)
-try {
-    $pdo->exec("INSERT INTO tratamientos (nombre_tratamiento, descripcion, costo, id_cita)
-                SELECT c.motivo, 'Tratamiento inicial', 0.00, c.id_cita
-                FROM citas c
-                LEFT JOIN tratamientos t ON c.id_cita = t.id_cita
-                WHERE t.id_tratamiento IS NULL");
-} catch (\PDOException $e) {
-    // Silencioso
-}
-
 // Inicializar variables para edición
 $editMode = false;
 $cita_edit = [
@@ -23,10 +12,7 @@ $cita_edit = [
     'motivo' => '',
     'estado' => 'Pendiente',
     'id_paciente' => '',
-    'id_dentista' => '',
-    'nombre_tratamiento' => '',
-    'costo' => '0.00',
-    'descripcion_tratamiento' => ''
+    'id_dentista' => ''
 ];
 
 // Comprobar si se solicita editar una cita
@@ -43,17 +29,6 @@ if (isset($_GET['edit']) && intval($_GET['edit']) > 0) {
             if (!empty($cita_edit['fecha_hora'])) {
                 $cita_edit['fecha_hora'] = str_replace(' ', 'T', substr($cita_edit['fecha_hora'], 0, 16));
             }
-            
-            // Obtener tratamiento asociado
-            $stmtTrat = $pdo->prepare("SELECT * FROM tratamientos WHERE id_cita = :id_cita");
-            $stmtTrat->execute([':id_cita' => $id_edit]);
-            $tratamiento = $stmtTrat->fetch();
-            if ($tratamiento) {
-                $cita_edit['nombre_tratamiento'] = $tratamiento['nombre_tratamiento'];
-                $cita_edit['costo'] = $tratamiento['costo'];
-                $cita_edit['descripcion_tratamiento'] = $tratamiento['descripcion'];
-            }
-            
             $editMode = true;
         }
     } catch (\PDOException $e) {
@@ -79,45 +54,39 @@ try {
     $error_msg = "Error al cargar la lista de dentistas: " . $e->getMessage();
 }
 
-// Obtener lista de tratamientos únicos ya registrados (catálogo implícito)
-try {
-    $stmtTrats = $pdo->query("SELECT nombre_tratamiento, costo, descripcion FROM tratamientos GROUP BY nombre_tratamiento ORDER BY nombre_tratamiento");
-    $listTratamientos = $stmtTrats->fetchAll();
-} catch (\PDOException $e) {
-    $listTratamientos = [];
-}
-
-// Si no hay tratamientos registrados (Base de datos limpia), proveemos un catálogo inicial de muestra
-if (count($listTratamientos) === 0) {
-    $listTratamientos = [
-        ['nombre_tratamiento' => 'Limpieza dental', 'costo' => '250.00', 'descripcion' => 'Limpieza profiláctica profunda y aplicación de flúor.'],
-        ['nombre_tratamiento' => 'Extracción simple', 'costo' => '350.00', 'descripcion' => 'Extracción quirúrgica simple de pieza dental.'],
-        ['nombre_tratamiento' => 'Resina dental', 'costo' => '300.00', 'descripcion' => 'Restauración dental estética con resina de alta calidad.'],
-        ['nombre_tratamiento' => 'Endodoncia', 'costo' => '1200.00', 'descripcion' => 'Tratamiento de conductos radiculares para salvar la pieza dental.'],
-        ['nombre_tratamiento' => 'Ajuste de brackets', 'costo' => '500.00', 'descripcion' => 'Control mensual de ortodoncia, cambio de ligas y ajuste de arco.']
-    ];
-}
-
-// Búsqueda de citas con reporte INNER JOIN
+// Búsqueda de citas agrupando tratamientos (Opción B - 5 Tablas)
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 try {
-    $sql = "SELECT c.*, p.nombre AS paciente_nombre, p.apellido AS paciente_apellido, 
-                   d.nombre AS dentista_nombre, d.apellido AS dentista_apellido,
-                   t.nombre_tratamiento, t.costo AS tratamiento_costo, t.descripcion AS tratamiento_descripcion
-            FROM citas c 
-            INNER JOIN pacientes p ON c.id_paciente = p.id_paciente 
-            INNER JOIN dentistas d ON c.id_dentista = d.id_dentista
-            INNER JOIN tratamientos t ON c.id_cita = t.id_cita";
-    
     if (!empty($search)) {
-        $sql .= " WHERE p.nombre LIKE :search OR p.apellido LIKE :search 
-                     OR d.nombre LIKE :search OR d.apellido LIKE :search 
-                     OR c.motivo LIKE :search OR t.nombre_tratamiento LIKE :search
-                  ORDER BY c.fecha_hora DESC";
+        $sql = "SELECT c.id_cita, c.fecha_hora, c.motivo, c.estado, c.id_paciente, c.id_dentista,
+                       p.nombre AS paciente_nombre, p.apellido AS paciente_apellido, 
+                       d.nombre AS dentista_nombre, d.apellido AS dentista_apellido,
+                       COALESCE(SUM(t.costo), 0.00) AS costo_total,
+                       COUNT(t.id_tratamiento) AS total_tratamientos
+                FROM citas c 
+                INNER JOIN pacientes p ON c.id_paciente = p.id_paciente 
+                INNER JOIN dentistas d ON c.id_dentista = d.id_dentista
+                LEFT JOIN tratamientos t ON c.id_cita = t.id_cita
+                LEFT JOIN catalogo_tratamientos ct ON t.id_catalogo_trabajo = ct.id_catalogo_tratamiento
+                WHERE p.nombre LIKE :search OR p.apellido LIKE :search 
+                   OR d.nombre LIKE :search OR d.apellido LIKE :search 
+                   OR c.motivo LIKE :search OR ct.nombre_tratamiento LIKE :search
+                GROUP BY c.id_cita, p.id_paciente, d.id_dentista
+                ORDER BY c.fecha_hora DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([':search' => '%' . $search . '%']);
     } else {
-        $sql .= " ORDER BY c.fecha_hora DESC";
+        $sql = "SELECT c.id_cita, c.fecha_hora, c.motivo, c.estado, c.id_paciente, c.id_dentista,
+                       p.nombre AS paciente_nombre, p.apellido AS paciente_apellido, 
+                       d.nombre AS dentista_nombre, d.apellido AS dentista_apellido,
+                       COALESCE(SUM(t.costo), 0.00) AS costo_total,
+                       COUNT(t.id_tratamiento) AS total_tratamientos
+                FROM citas c 
+                INNER JOIN pacientes p ON c.id_paciente = p.id_paciente 
+                INNER JOIN dentistas d ON c.id_dentista = d.id_dentista
+                LEFT JOIN tratamientos t ON c.id_cita = t.id_cita
+                GROUP BY c.id_cita, p.id_paciente, d.id_dentista
+                ORDER BY c.fecha_hora DESC";
         $stmt = $pdo->query($sql);
     }
     $citas = $stmt->fetchAll();
@@ -127,12 +96,114 @@ try {
 }
 ?>
 
+<style>
+/* Estilos para el Modal de Detalles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeInModal 0.25s ease-out;
+}
+
+.modal-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 650px;
+    box-shadow: var(--shadow-md);
+    animation: slideUpModal 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.modal-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-card-header h3 {
+    font-family: var(--font-title);
+    color: var(--primary-dark);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+    transition: var(--transition);
+}
+
+.modal-close-btn:hover {
+    color: #ef4444;
+}
+
+.modal-card-body {
+    padding: 24px;
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+}
+
+.info-block h5 {
+    font-family: var(--font-title);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.info-block p {
+    color: var(--primary-dark);
+    font-weight: 600;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.info-block small {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
 <main class="site-main">
     <div class="module-container">
         <header class="module-header">
             <div class="module-badge">Módulo Activo</div>
             <h2 class="module-title">Agenda y Control de Citas Médicas</h2>
-            <p class="module-subtitle">Programe citas, asigne especialistas y registre los tratamientos dentales junto a sus costos (Reporte Combinado INNER JOIN).</p>
+            <p class="module-subtitle">Programe citas, asigne especialistas y realice el seguimiento a tratamientos y costos asociados.</p>
         </header>
 
         <!-- Contenedor de Alertas de Éxito o Error -->
@@ -166,7 +237,7 @@ try {
                     <div class="seccion-header" style="padding-bottom: 12px; margin-bottom: 8px;">
                         <span class="seccion-subtitle"><?php echo $editMode ? 'Editar Cita' : 'Nueva Cita'; ?></span>
                         <h4 style="margin: 0; color: var(--primary-dark); font-family: var(--font-title); font-size: 1.25rem;">
-                            <?php echo $editMode ? 'Modificar Cita Programada' : 'Programar Nueva Cita con Tratamiento'; ?>
+                            <?php echo $editMode ? 'Modificar Cita Programada' : 'Programar Nueva Cita'; ?>
                         </h4>
                     </div>
 
@@ -176,7 +247,7 @@ try {
                         <?php endif; ?>
 
                         <div class="patient-form-grid">
-                            <!-- Datos de la Cita -->
+                            <!-- Paciente -->
                             <div class="form-group">
                                 <label for="id_paciente">Paciente *</label>
                                 <select id="id_paciente" name="id_paciente" class="form-control" required>
@@ -191,6 +262,7 @@ try {
                                 </select>
                             </div>
 
+                            <!-- Dentista -->
                             <div class="form-group">
                                 <label for="id_dentista">Dentista Asignado *</label>
                                 <select id="id_dentista" name="id_dentista" class="form-control" required>
@@ -205,11 +277,13 @@ try {
                                 </select>
                             </div>
 
+                            <!-- Fecha y Hora -->
                             <div class="form-group">
                                 <label for="fecha_hora">Fecha y Hora *</label>
                                 <input type="datetime-local" id="fecha_hora" name="fecha_hora" class="form-control" required value="<?php echo htmlspecialchars($cita_edit['fecha_hora']); ?>">
                             </div>
 
+                            <!-- Estado -->
                             <div class="form-group">
                                 <label for="estado">Estado de la Cita</label>
                                 <select id="estado" name="estado" class="form-control">
@@ -220,53 +294,16 @@ try {
                                 </select>
                             </div>
 
-                            <!-- Datos del Tratamiento -->
-                            <div class="form-group">
-                                <label for="nombre_tratamiento_select">Seleccionar Tratamiento *</label>
-                                <select id="nombre_tratamiento_select" class="form-control" onchange="handleTreatmentSelect(this.value)" required>
-                                    <option value="">-- Seleccionar Tratamiento --</option>
-                                    <?php 
-                                    $nombreEnLista = false;
-                                    foreach ($listTratamientos as $trat): 
-                                        $selected = ($cita_edit['nombre_tratamiento'] === $trat['nombre_tratamiento']);
-                                        if ($selected) { $nombreEnLista = true; }
-                                    ?>
-                                        <option value="<?php echo htmlspecialchars($trat['nombre_tratamiento']); ?>" <?php echo $selected ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($trat['nombre_tratamiento']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                    <option value="otro" <?php echo ($editMode && !empty($cita_edit['nombre_tratamiento']) && !$nombreEnLista) ? 'selected' : ''; ?>>
-                                        -- Otro (Ingresar manualmente) --
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="form-group" id="custom-treatment-group" style="display: none;">
-                                <label for="nombre_tratamiento">Nombre del Tratamiento Manual *</label>
-                                <input type="text" id="nombre_tratamiento" name="nombre_tratamiento" class="form-control" placeholder="Escriba el nombre del nuevo tratamiento" value="<?php echo htmlspecialchars($cita_edit['nombre_tratamiento']); ?>">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="costo">Costo del Tratamiento (Q) *</label>
-                                <input type="number" id="costo" name="costo" class="form-control" placeholder="Ej. 350.00" min="0" step="0.01" required value="<?php echo htmlspecialchars($cita_edit['costo']); ?>">
-                            </div>
-
+                            <!-- Motivo de Consulta -->
                             <div class="form-group form-group-full">
                                 <label for="motivo">Motivo de la Consulta *</label>
                                 <input type="text" id="motivo" name="motivo" class="form-control" placeholder="Ej. Dolor agudo, revisión de brackets..." required value="<?php echo htmlspecialchars($cita_edit['motivo']); ?>">
-                            </div>
-
-                            <div class="form-group form-group-full">
-                                <label for="descripcion_tratamiento">Descripción Detallada del Tratamiento</label>
-                                <textarea id="descripcion_tratamiento" name="descripcion_tratamiento" class="form-control" placeholder="Detalles u observaciones del tratamiento dental..."><?php echo htmlspecialchars($cita_edit['descripcion_tratamiento'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
                         <div class="patient-form-actions">
                             <?php if ($editMode): ?>
-                                <a href="citas.php" class="btn btn-outline">
-                                    Cancelar
-                                </a>
+                                <a href="citas.php" class="btn btn-outline">Cancelar</a>
                             <?php endif; ?>
                             <button type="submit" class="btn btn-primary">
                                 <?php echo $editMode ? 'Actualizar Cita' : 'Programar Cita'; ?>
@@ -276,14 +313,14 @@ try {
                 </div>
             </div>
 
-            <!-- Panel Inferior: Listado de Citas con INNER JOIN -->
+            <!-- Panel Inferior: Listado de Citas -->
             <div class="patients-list-section">
                 <div class="table-actions">
                     <form method="GET" action="citas.php" class="search-box">
                         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input type="text" name="search" class="form-control" placeholder="Buscar por paciente, dentista, tratamiento..." value="<?php echo htmlspecialchars($search); ?>">
+                        <input type="text" name="search" class="form-control" placeholder="Buscar por paciente, dentista, motivo..." value="<?php echo htmlspecialchars($search); ?>">
                     </form>
                     <?php if (!empty($search)): ?>
                         <a href="citas.php" class="btn btn-outline btn-xs">Limpiar búsqueda</a>
@@ -297,8 +334,9 @@ try {
                                 <th>Paciente</th>
                                 <th>Dentista</th>
                                 <th>Fecha y Hora</th>
-                                <th>Motivo / Tratamiento</th>
-                                <th>Costo</th>
+                                <th>Motivo</th>
+                                <th>Tratamientos</th>
+                                <th>Costo Total</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -322,20 +360,15 @@ try {
                                             ?>
                                         </td>
                                         <td>
-                                            <span style="font-size: 0.88rem; color: var(--text-muted);">Motivo: <?php echo htmlspecialchars($cita['motivo']); ?></span>
-                                            <br>
-                                            <strong>Tratamiento: <?php echo htmlspecialchars($cita['nombre_tratamiento']); ?></strong>
-                                            <?php if (!empty($cita['tratamiento_descripcion'])): ?>
-                                                <br>
-                                                <small style="color: var(--text-muted); font-style: italic;" title="<?php echo htmlspecialchars($cita['tratamiento_descripcion']); ?>">
-                                                    <?php 
-                                                    echo htmlspecialchars(strlen($cita['tratamiento_descripcion']) > 50 ? substr($cita['tratamiento_descripcion'], 0, 47) . '...' : $cita['tratamiento_descripcion']); 
-                                                    ?>
-                                                </small>
-                                            <?php endif; ?>
+                                            <?php echo htmlspecialchars($cita['motivo']); ?>
                                         </td>
                                         <td>
-                                            <strong style="color: var(--accent);">Q <?php echo number_format($cita['tratamiento_costo'], 2); ?></strong>
+                                            <span class="badge" style="background-color: var(--primary-light); color: var(--primary-hover); font-weight: 600; cursor: pointer;" onclick="openDetailsModal(<?php echo $cita['id_cita']; ?>)" title="Ver listado de tratamientos">
+                                                <?php echo $cita['total_tratamientos']; ?> realiz.
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong style="color: var(--accent);">Q <?php echo number_format($cita['costo_total'], 2); ?></strong>
                                         </td>
                                         <td>
                                             <?php 
@@ -351,10 +384,16 @@ try {
                                         </td>
                                         <td>
                                             <div class="actions-cell">
-                                                <a href="citas.php?edit=<?php echo $cita['id_cita']; ?>" class="btn btn-secondary btn-xs" title="Editar Cita">
+                                                <button class="btn btn-secondary btn-xs" onclick="openDetailsModal(<?php echo $cita['id_cita']; ?>)" title="Ver Ficha de Detalle" style="color: var(--primary); background-color: var(--primary-light);">
+                                                    Detalle
+                                                </button>
+                                                <a href="tratamientos.php?id_cita=<?php echo $cita['id_cita']; ?>" class="btn btn-secondary btn-xs" style="color: var(--accent); background-color: rgba(13, 148, 136, 0.08);" title="Gestionar Tratamientos">
+                                                    + Agregar
+                                                </a>
+                                                <a href="citas.php?edit=<?php echo $cita['id_cita']; ?>" class="btn btn-outline btn-xs" title="Editar Cita">
                                                     Editar
                                                 </a>
-                                                <a href="Citas/eliminar.php?id=<?php echo $cita['id_cita']; ?>" class="btn btn-outline btn-xs" style="color: #b91c1c; border-color: rgba(239, 68, 68, 0.2);" onclick="return confirm('¿Está seguro de que desea eliminar esta cita y su tratamiento asociado?');" title="Eliminar Cita">
+                                                <a href="Citas/eliminar.php?id=<?php echo $cita['id_cita']; ?>" class="btn btn-outline btn-xs" style="color: #b91c1c; border-color: rgba(239, 68, 68, 0.2);" onclick="return confirm('¿Está seguro de que desea eliminar esta cita y todos sus tratamientos asociados?');" title="Eliminar Cita">
                                                     Eliminar
                                                 </a>
                                             </div>
@@ -363,7 +402,7 @@ try {
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">
                                         No se encontraron citas médicas programadas.
                                     </td>
                                 </tr>
@@ -377,58 +416,144 @@ try {
     </div>
 </main>
 
+<!-- Modal de Detalle de Cita -->
+<div id="citas-detalle-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+        <header class="modal-card-header">
+            <h3>Detalle de la Cita Médica</h3>
+            <button onclick="closeDetailsModal()" class="modal-close-btn">&times;</button>
+        </header>
+        <div class="modal-card-body">
+            <!-- Grid de Información -->
+            <div class="modal-info-grid">
+                <div class="info-block">
+                    <h5>Paciente</h5>
+                    <p id="modal-paciente-nombre"></p>
+                    <small id="modal-paciente-contacto"></small>
+                </div>
+                <div class="info-block">
+                    <h5>Especialista</h5>
+                    <p id="modal-dentista-nombre"></p>
+                    <small id="modal-dentista-especialidad"></small>
+                </div>
+                <div class="info-block">
+                    <h5>Fecha y Hora</h5>
+                    <p id="modal-cita-fecha"></p>
+                </div>
+                <div class="info-block">
+                    <h5>Estado</h5>
+                    <span id="modal-cita-estado" class="badge"></span>
+                </div>
+            </div>
+
+            <div class="info-block" style="margin-top: 16px;">
+                <h5>Motivo de la Cita</h5>
+                <p id="modal-cita-motivo" style="font-weight: 500;"></p>
+            </div>
+
+            <!-- Tabla de Tratamientos Realizados -->
+            <div class="modal-treatments-section" style="margin-top: 24px;">
+                <h4 style="font-family: var(--font-title); color: var(--primary-dark); margin-bottom: 12px; font-size: 1.1rem;">Tratamientos Realizados</h4>
+                <div class="table-responsive" style="max-height: 250px;">
+                    <table class="custom-table" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>Tratamiento</th>
+                                <th>Observaciones</th>
+                                <th>Costo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-treatments-table-body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-total-sum" style="text-align: right; margin-top: 16px;">
+                    <strong>Total Acumulado: </strong>
+                    <strong style="color: var(--accent); font-size: 1.1rem;" id="modal-total-cost">Q 0.00</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-// Catálogo de tratamientos para autocompletar costo y descripción en el formulario
-const catalogoTratamientos = <?php echo json_encode($listTratamientos); ?>;
-
-function handleTreatmentSelect(val) {
-    const customInputGroup = document.getElementById('custom-treatment-group');
-    const customInput = document.getElementById('nombre_tratamiento');
-    const costoInput = document.getElementById('costo');
-    const descInput = document.getElementById('descripcion_tratamiento');
-
-    if (val === 'otro') {
-        customInputGroup.style.display = 'block';
-        customInput.value = '';
-        customInput.required = true;
-        customInput.focus();
-        
-        costoInput.value = '0.00';
-        descInput.value = '';
-    } else if (val === '') {
-        customInputGroup.style.display = 'none';
-        customInput.value = '';
-        customInput.required = false;
-        
-        costoInput.value = '0.00';
-        descInput.value = '';
-    } else {
-        customInputGroup.style.display = 'none';
-        customInput.value = val;
-        customInput.required = false;
-
-        // Buscar el costo y descripción en el catálogo para autocompletar
-        const selected = catalogoTratamientos.find(t => t.nombre_tratamiento === val);
-        if (selected) {
-            costoInput.value = selected.costo;
-            descInput.value = selected.descripcion;
-        }
-    }
+function openDetailsModal(idCita) {
+    const modal = document.getElementById('citas-detalle-modal');
+    
+    // Hacer fetch al endpoint de detalle
+    fetch('Citas/obtener_detalle.php?id_cita=' + idCita)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Rellenar información de la cita
+                document.getElementById('modal-paciente-nombre').innerText = data.cita.pac_apellido + ', ' + data.cita.pac_nombre;
+                document.getElementById('modal-paciente-contacto').innerText = 'Tel: ' + (data.cita.pac_telefono || 'N/A') + ' | Email: ' + (data.cita.pac_correo || 'N/A');
+                
+                document.getElementById('modal-dentista-nombre').innerText = data.cita.den_apellido + ', ' + data.cita.den_nombre;
+                document.getElementById('modal-dentista-especialidad').innerText = 'Especialidad: ' + data.cita.den_especialidad;
+                
+                document.getElementById('modal-cita-fecha').innerText = data.cita.fecha_hora_formateada;
+                document.getElementById('modal-cita-motivo').innerText = data.cita.motivo;
+                
+                // Badge de estado
+                const estadoBadge = document.getElementById('modal-cita-estado');
+                estadoBadge.innerText = data.cita.estado;
+                estadoBadge.className = 'badge'; // reset class
+                
+                let badgeClass = '';
+                switch(data.cita.estado) {
+                    case 'Pendiente': badgeClass = 'badge-pendiente'; break;
+                    case 'Confirmada': badgeClass = 'badge-confirmada'; break;
+                    case 'Cancelada': badgeClass = 'badge-cancelada'; break;
+                    case 'Atendida': badgeClass = 'badge-atendida'; break;
+                }
+                estadoBadge.classList.add(badgeClass);
+                
+                // Rellenar tratamientos
+                const tbody = document.getElementById('modal-treatments-table-body');
+                tbody.innerHTML = ''; // Limpiar
+                
+                if (data.tratamientos.length > 0) {
+                    data.tratamientos.forEach(t => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong>${t.nombre_tratamiento}</strong></td>
+                            <td>${t.observaciones || '<span style="color:var(--text-muted); font-style:italic;">Sin observaciones</span>'}</td>
+                            <td><strong style="color:var(--accent);">Q ${parseFloat(t.costo).toFixed(2)}</strong></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td colspan="3" style="text-align:center; color:var(--text-muted); padding:16px;">No se registraron tratamientos para esta cita.</td>`;
+                    tbody.appendChild(tr);
+                }
+                
+                // Actualizar total
+                document.getElementById('modal-total-cost').innerText = 'Q ' + parseFloat(data.costo_total).toFixed(2);
+                
+                // Mostrar modal
+                modal.style.display = 'flex';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error al conectar con el servidor.');
+        });
 }
 
-// Configurar el estado inicial al cargar la página (para el modo edición)
-document.addEventListener('DOMContentLoaded', () => {
-    const selectEl = document.getElementById('nombre_tratamiento_select');
-    if (selectEl) {
-        if (selectEl.value !== '') {
-            const val = selectEl.value;
-            if (val === 'otro') {
-                document.getElementById('custom-treatment-group').style.display = 'block';
-                document.getElementById('nombre_tratamiento').required = true;
-            } else {
-                handleTreatmentSelect(val);
-            }
-        }
+function closeDetailsModal() {
+    document.getElementById('citas-detalle-modal').style.display = 'none';
+}
+
+// Cerrar si se hace clic fuera del contenido del modal
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('citas-detalle-modal');
+    if (e.target === modal) {
+        closeDetailsModal();
     }
 });
 </script>

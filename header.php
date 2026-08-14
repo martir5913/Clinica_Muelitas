@@ -52,6 +52,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <nav class="site-nav">
                 <a href="pacientes.php" id="nav-pacientes" class="<?php echo ($currentPage === 'pacientes.php') ? 'active' : ''; ?>">Pacientes</a>
                 <a href="dentistas.php" id="nav-dentistas" class="<?php echo ($currentPage === 'dentistas.php') ? 'active' : ''; ?>">Dentistas</a>
+                <a href="servicios.php" id="nav-servicios" class="<?php echo ($currentPage === 'servicios.php') ? 'active' : ''; ?>">Servicios</a>
                 <a href="tratamientos.php" id="nav-tratamientos" class="<?php echo ($currentPage === 'tratamientos.php') ? 'active' : ''; ?>">Tratamientos</a>
                 <a href="citas.php" id="nav-citas" class="<?php echo ($currentPage === 'citas.php') ? 'active' : ''; ?>">Citas</a>
             </nav>
