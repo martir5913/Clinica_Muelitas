@@ -97,7 +97,6 @@ $filtroEspecialidad = '';
 if (isset($_GET['especialidad'])) {
     $filtroEspecialidad = $_GET['especialidad'];
 }
-
 $filtroEstado = '';
 if (isset($_GET['estado'])) {
     $filtroEstado = $_GET['estado'];
@@ -105,8 +104,27 @@ if (isset($_GET['estado'])) {
 
 include 'header.php';
 
-//Listado simple de dentistas
-$stmt = $pdo->query("SELECT * FROM dentistas ORDER BY apellido, nombre");
+//Filtros de búsqueda y consultas preparadas:
+$condiciones = [];
+$parametros  = [];
+
+if ($filtroEspecialidad !== '' && in_array($filtroEspecialidad, $especialidades, true)) {
+    $condiciones[] = 'especialidad = :especialidad';
+    $parametros['especialidad'] = $filtroEspecialidad;
+}
+if ($filtroEstado !== '' && in_array($filtroEstado, ['0', '1'], true)) {
+    $condiciones[] = 'activo = :activo';
+    $parametros['activo'] = (int) $filtroEstado;
+}
+$sql = "SELECT * FROM dentistas";
+if (!empty($condiciones)) {
+    $sql .= " WHERE " . implode(' AND ', $condiciones);
+}
+$sql .= " ORDER BY apellido, nombre";
+
+// Ejecutar la consulta y obtener los resultados
+$stmt = $pdo->prepare($sql);
+$stmt->execute($parametros);
 $dentistas = $stmt->fetchAll();
 ?>
 
@@ -157,6 +175,37 @@ $dentistas = $stmt->fetchAll();
         </div>
         <?php endif; ?>
 
+        <!-- Barra de filtros -->
+         <form method="GET" action="dentistas.php" class="filter-bar">
+            <div class="form-group">
+                <label for="especialidad_filtro">Especialidad</label>
+                <select id="especialidad_filtro" name="especialidad" class="form-control">
+                    <option value="">Todas</option>
+                    <?php foreach ($especialidades as $op): ?>
+                        <option value="<?php echo $op; ?>" <?php echo ($filtroEspecialidad === $op) ? 'selected' : ''; ?>><?php echo $op; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="estado_filtro">Estado</label>
+                <select id="estado_filtro" name="estado" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="1" <?php echo ($filtroEstado === '1') ? 'selected' : ''; ?>>Activos</option>
+                    <option value="0" <?php echo ($filtroEstado === '0') ? 'selected' : ''; ?>>Inactivos</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-secondary">Filtrar</button>
+                <?php if ($filtroEspecialidad !== '' || $filtroEstado !== ''): ?>
+                    <a href="dentistas.php" class="btn btn-outline">Limpiar</a>
+                <?php endif; ?>
+            </div>
+        </form>
+
+        <div class="form-section">
+        
         <!-- Formulario para crear/editar dentistas -->
         <div class="form-section">
             <div class="form-section-badge"><?php echo $modoEdicion ? 'Edición de Registro' : 'Nuevo Registro'; ?></div>
