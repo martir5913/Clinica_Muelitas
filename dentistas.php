@@ -92,6 +92,17 @@ if (isset($_GET['mensaje'])) {
     $mensaje = $_GET['mensaje'];
 }
 
+//Leer los filtros que llegan mediante GET
+$filtroEspecialidad = '';
+if (isset($_GET['especialidad'])) {
+    $filtroEspecialidad = $_GET['especialidad'];
+}
+
+$filtroEstado = '';
+if (isset($_GET['estado'])) {
+    $filtroEstado = $_GET['estado'];
+}
+
 include 'header.php';
 
 //Listado simple de dentistas
