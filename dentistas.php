@@ -174,37 +174,6 @@ $dentistas = $stmt->fetchAll();
             </form>
         </div>
         <?php endif; ?>
-
-        <!-- Barra de filtros -->
-         <form method="GET" action="dentistas.php" class="filter-bar">
-            <div class="form-group">
-                <label for="especialidad_filtro">Especialidad</label>
-                <select id="especialidad_filtro" name="especialidad" class="form-control">
-                    <option value="">Todas</option>
-                    <?php foreach ($especialidades as $op): ?>
-                        <option value="<?php echo $op; ?>" <?php echo ($filtroEspecialidad === $op) ? 'selected' : ''; ?>><?php echo $op; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="estado_filtro">Estado</label>
-                <select id="estado_filtro" name="estado" class="form-control">
-                    <option value="">Todos</option>
-                    <option value="1" <?php echo ($filtroEstado === '1') ? 'selected' : ''; ?>>Activos</option>
-                    <option value="0" <?php echo ($filtroEstado === '0') ? 'selected' : ''; ?>>Inactivos</option>
-                </select>
-            </div>
-
-            <div class="filter-actions">
-                <button type="submit" class="btn btn-secondary">Filtrar</button>
-                <?php if ($filtroEspecialidad !== '' || $filtroEstado !== ''): ?>
-                    <a href="dentistas.php" class="btn btn-outline">Limpiar</a>
-                <?php endif; ?>
-            </div>
-        </form>
-
-        <div class="form-section">
         
         <!-- Formulario para crear/editar dentistas -->
         <div class="form-section">
@@ -270,6 +239,33 @@ $dentistas = $stmt->fetchAll();
                 </div>
             </form>
         </div>
+
+        <!-- Barra de filtros -->
+        <form method="GET" action="dentistas.php" class="filter-bar">
+            <div class="form-group">
+                <label for="especialidad_filtro">Especialidad</label>
+                <select id="especialidad_filtro" name="especialidad" class="form-control">
+                    <option value="">Todas</option>
+                    <?php foreach ($especialidades as $op): ?>
+                        <option value="<?php echo $op; ?>" <?php echo ($filtroEspecialidad === $op) ? 'selected' : ''; ?>><?php echo $op; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="estado_filtro">Estado</label>
+                <select id="estado_filtro" name="estado" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="1" <?php echo ($filtroEstado === '1') ? 'selected' : ''; ?>>Activos</option>
+                    <option value="0" <?php echo ($filtroEstado === '0') ? 'selected' : ''; ?>>Inactivos</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-secondary">Filtrar</button>
+                <?php if ($filtroEspecialidad !== '' || $filtroEstado !== ''): ?>
+                    <a href="dentistas.php" class="btn btn-outline">Limpiar</a>
+                <?php endif; ?>
+            </div>
+        </form>
 
         <!-- Lista de dentistas -->
         <?php if (count($dentistas) === 0): ?>
