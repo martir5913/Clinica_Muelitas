@@ -3,7 +3,7 @@
 ## Tablas
 
 *Paciente
-*Dentista.
+*Dentista
 *Citas
 *Tratamientos (Lista de sericios que ofrece la clinica)
 
