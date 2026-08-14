@@ -93,9 +93,8 @@ if (isset($_GET['mensaje'])) {
     $mensaje = $_GET['mensaje'];
 }
 
-
-
 include 'header.php';
+
 //Listado simple de dentistas
 $stmt = $pdo->query("SELECT * FROM dentistas ORDER BY apellido, nombre");
 $dentistas = $stmt->fetchAll();
@@ -108,12 +107,16 @@ $dentistas = $stmt->fetchAll();
             <h2 class="module-title">Personal Odontológico y Especialistas</h2>
             <p class="module-subtitle">Administre el registro de dentistas, especialidades (General, Ortodoncia, Endodoncia, Cirugía, etc.), contacto y disponibilidad.</p>
         </header>
-        
-        <!-- Confirmación tras crear un nuevo dentista-->
+
+        <!-- Mensajes de confirmación -->
         <?php if ($mensaje === 'creado'): ?>
             <div class="alert alert-success">Dentista registrado correctamente.</div>
+        <?php elseif ($mensaje === 'editado'): ?>
+            <div class="alert alert-success">Datos del dentista actualizados correctamente.</div>
+        <?php elseif ($mensaje === 'desactivado'): ?>
+            <div class="alert alert-success">Dentista desactivado correctamente.</div>
         <?php endif; ?>
-        
+
         <!-- Bloque de validación -->
         <?php if (!empty($errores)): ?>
             <div class="alert alert-error">
@@ -124,13 +127,30 @@ $dentistas = $stmt->fetchAll();
                 </ul>
             </div>
         <?php endif; ?>
-        
-        <!-- Formulario para crear dentistas -->
-        <div class="form-section">
-            <div class="form-section-badge">Nuevo Registro</div>
-            <h3 class="form-section-title">Registrar Dentista</h3>
 
-            <form method="POST" action="dentistas.php" class="form-grid">
+        <!-- Tarjeta de confirmación para desactivar -->
+        <?php if ($modoEliminar): ?>
+        <div class="confirm-card">
+            <p>¿Está seguro que desea desactivar a:</p>
+            <p class="confirm-nombre">
+                <?php echo htmlspecialchars($dentistaEliminar['nombre'] . ' ' . $dentistaEliminar['apellido'], ENT_QUOTES, 'UTF-8'); ?>
+                — <?php echo htmlspecialchars($dentistaEliminar['especialidad'], ENT_QUOTES, 'UTF-8'); ?>
+            </p>
+            <form method="POST" action="dentistas/procesar.php" class="form-actions">
+                <input type="hidden" name="confirmar_eliminar" value="<?php echo (int) $dentistaEliminar['id_dentista']; ?>">
+                <a href="dentistas.php" class="btn btn-outline">Cancelar</a>
+                <button type="submit" class="btn btn-danger">Sí, Desactivar</button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <!-- Formulario para crear/editar dentistas -->
+        <div class="form-section">
+            <div class="form-section-badge"><?php echo $modoEdicion ? 'Edición de Registro' : 'Nuevo Registro'; ?></div>
+            <h3 class="form-section-title"><?php echo $modoEdicion ? 'Editar Dentista' : 'Registrar Dentista'; ?></h3>
+            <form method="POST" action="dentistas/procesar.php" class="form-grid">
+                <input type="hidden" name="id" value="<?php echo $modoEdicion ? (int) $idEditar : ''; ?>">
+
                 <div class="form-group">
                     <label for="nombre">Nombre</label>
                     <input type="text" id="nombre" name="nombre" class="form-control"
@@ -169,8 +189,22 @@ $dentistas = $stmt->fetchAll();
                            placeholder="correo@ejemplo.com">
                 </div>
 
+                <?php if ($modoEdicion): ?>
+                <div class="form-group form-group-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="activo" value="1" <?php echo $activo ? 'checked' : ''; ?>>
+                        Dentista activo
+                    </label>
+                </div>
+                <?php endif; ?>
+
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Guardar Dentista</button>
+                    <?php if ($modoEdicion): ?>
+                        <a href="dentistas.php" class="btn btn-outline">Cancelar</a>
+                    <?php endif; ?>
+                    <button type="submit" class="btn btn-primary">
+                        <?php echo $modoEdicion ? 'Guardar Cambios' : 'Guardar Dentista'; ?>
+                    </button>
                 </div>
             </form>
         </div>
