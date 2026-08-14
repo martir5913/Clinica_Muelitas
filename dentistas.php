@@ -43,6 +43,24 @@ $telefono     = '';
 $correo       = '';
 $activo       = 1;
 
+//Si se está en modo edición, se cargan los datos del dentista a editar
+if ($modoEdicion) {
+    $stmt = $pdo->prepare("SELECT * FROM dentistas WHERE id_dentista = :id");
+    $stmt->execute(['id' => $idEditar]);
+    $dentistaEditar = $stmt->fetch();
+
+    if ($dentistaEditar) {
+        $nombre       = $dentistaEditar['nombre'];
+        $apellido     = $dentistaEditar['apellido'];
+        $especialidad = $dentistaEditar['especialidad'];
+        $telefono     = $dentistaEditar['telefono'];
+        $correo       = $dentistaEditar['correo'];
+        $activo       = $dentistaEditar['activo'];
+    } else {
+        $modoEdicion = false;
+    }
+}
+
 
 //Procesamiento de formuario cuando lo envia el método POST, 
 //en caso de que la solicitud required de html sea burlada
