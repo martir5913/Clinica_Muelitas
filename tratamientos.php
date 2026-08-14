@@ -270,7 +270,7 @@ include 'header.php';
 
             <p>
                 Este formulario está diseñado para trabajar con la tabla
-                <code>tratamiento</code> de la base de datos.
+                <code>tratamiento</code> de la base de datos
             </p>
 
             <div class="fields-list">
