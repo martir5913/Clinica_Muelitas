@@ -154,7 +154,7 @@ $dentistas = $stmt->fetchAll();
                     <label for="nombre">Nombre</label>
                     <input type="text" id="nombre" name="nombre" class="form-control"
                            value="<?php echo htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?>"
-                           placeholder="Ej. José" required>
+                           placeholder="Ej. José" reqquired>
                 </div>
 
                 <div class="form-group">
