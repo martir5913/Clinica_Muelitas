@@ -1,5 +1,5 @@
 <?php
-sesion_start(); // Usado para manejar la lógica de los posibles errores y mensajes de validación
+session_start(); // Usado para manejar la lógica de los posibles errores y mensajes de validación
 require_once '../conexion.php';
 
 // Lista de especialidades válidas (coincide con el ENUM de la BD)
