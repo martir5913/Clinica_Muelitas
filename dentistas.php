@@ -2,10 +2,9 @@
 // Módulo: Dentistas
 //Inicialización de sesion
 session_start();
-
+require_once 'conexion.php';
 $projectName = 'Clinica Dental — Muelitas';
 $extraStyles = 'style-dentistas-module.css'; //Carga de estilos adicionales
-require_once 'conexion.php';
 
 //Lista de especialidades válidas (coincide con el ENUM de la BD)
 $especialidades = ['General', 'Ortodoncia', 'Endodoncia', 'Cirugia', 'Pediatria', 'Periodoncia', 'Protesis'];
