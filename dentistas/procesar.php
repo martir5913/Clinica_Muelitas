@@ -119,6 +119,24 @@ if (empty($errores)) {
     }
 }
 
+//Si hay errores, se guardan en la sesión y se redirige de vuelta al formulario
+$_SESSION['form_data'] = [
+    'id'           => $idPost,
+    'nombre'       => $nombre,
+    'apellido'     => $apellido,
+    'especialidad' => $especialidad,
+    'telefono'     => $telefono,
+    'correo'       => $correo,
+    'activo'       => $activo,
+];
 
+//En caso que fuera el modo edición se redirige a la misma url
+if ($idPost) {
+    header('Location: ../dentistas.php?action=editar&id=' . $idPost);
+} else {
+    header('Location: ../dentistas.php');
+}
+exit;
 ?>
+
 
