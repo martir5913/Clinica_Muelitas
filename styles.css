@@ -1,0 +1,1012 @@
+/* =============================================
+   Clinica Dental - Muelitas | Diseño Minimalista Moderno
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* Paleta de Colores - Temática Dental/Salud Refinada */
+    --primary: #0284c7;
+    /* Azul cielo clínico premium */
+    --primary-hover: #0369a1;
+    /* Azul cielo oscuro */
+    --primary-light: #e0f2fe;
+    /* Fondo azul muy suave */
+    --primary-dark: #0f172a;
+    /* Slate 900 para encabezados */
+    --accent: #0d9488;
+    /* Teal/Verde menta antiséptico */
+    --text: #1e293b;
+    /* Slate 800 para legibilidad */
+    --text-muted: #64748b;
+    /* Slate 500 para textos secundarios */
+    --border: #e2e8f0;
+    /* Slate 200 para líneas sutiles */
+    --bg: #f0f7ff;
+    /* Azul pastel médico muy suave */
+    --card-bg: #ffffff;
+    /* Blanco puro */
+
+    /* Tipografías Especializadas */
+    --font-title: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+
+    /* Estructura y Sombras */
+    --ancho: 1600px;
+    --radius: 16px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 12px rgba(15, 23, 42, 0.03), 0 1px 4px rgba(15, 23, 42, 0.02);
+    --shadow-md: 0 12px 24px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+    scroll-behavior: smooth;
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background-color: var(--bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* ---- Encabezado (Header Glassmorphism) ---- */
+
+.site-header {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+}
+
+.site-header-inner {
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary-dark);
+}
+
+.logo-link:hover {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--primary);
+    transition: var(--transition);
+}
+
+.logo-link:hover .logo-icon {
+    transform: rotate(-8deg) scale(1.08);
+}
+
+.logo-text {
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.site-nav a {
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.site-nav a:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    text-decoration: none;
+}
+
+/* Identificar página activa */
+.site-nav a.active {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+/* ---- Layout Principal ---- */
+
+.site-main {
+    flex: 1;
+    max-width: var(--ancho);
+    width: 100%;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ---- Sección Hero ---- */
+
+.hero-section {
+    background: linear-gradient(135deg, #e1f5fe 0%, #ffffff 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 50px 48px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(2, 132, 199, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.hero-container {
+    max-width: 680px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    background-color: var(--primary-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.hero-title {
+    font-family: var(--font-title);
+    font-size: 2.3rem;
+    line-height: 1.15;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+}
+
+.hero-description {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.65;
+}
+
+.hero-action-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    position: relative;
+}
+
+.pulse-dot::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+}
+
+/* ---- Secciones Institucionales (Nosotros, Ubicación) ---- */
+
+.seccion-institucional {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.seccion-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+}
+
+.seccion-subtitle {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.seccion-main-title {
+    font-family: var(--font-title);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: -0.02em;
+}
+
+.seccion-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.seccion-body p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.seccion-body strong {
+    color: var(--primary-dark);
+}
+
+/* ---- Grilla de Nosotros con Imagen ---- */
+
+.nosotros-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 32px;
+    align-items: center;
+}
+
+.nosotros-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.nosotros-content p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.nosotros-content strong {
+    color: var(--primary-dark);
+}
+
+.nosotros-media {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 3px solid #ffffff;
+    transition: var(--transition);
+}
+
+.nosotros-media:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.clinica-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* ---- Sección Misión y Visión (Layout Dos Columnas) ---- */
+
+.grid-mision-vision {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.mision-card,
+.vision-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: var(--transition);
+}
+
+.mision-card:hover,
+.vision-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(2, 132, 199, 0.2);
+}
+
+.card-icon {
+    width: 44px;
+    height: 44px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.mision-card h4,
+.vision-card h4 {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    letter-spacing: -0.01em;
+}
+
+.mision-card p,
+.vision-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+}
+
+/* ---- Mapa de Google Maps ---- */
+
+.mapa-container {
+    margin-top: 8px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    height: 350px;
+    box-shadow: var(--shadow);
+}
+
+.mapa-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* ---- Estructura de Módulos (Contenedor Común) ---- */
+
+.module-container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.module-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+}
+
+.module-badge {
+    display: inline-flex;
+    font-family: var(--font-title);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    background-color: rgba(13, 148, 136, 0.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.module-title {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.module-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 800px;
+}
+
+/* ---- Contenedor Placeholder ---- */
+
+.placeholder-card {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 48px 32px;
+    text-align: center;
+    background-color: rgba(248, 250, 252, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    transition: var(--transition);
+}
+
+.placeholder-card:hover {
+    background-color: rgba(2, 132, 199, 0.01);
+    border-color: rgba(2, 132, 199, 0.3);
+}
+
+.placeholder-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-bottom: 8px;
+}
+
+.placeholder-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.placeholder-card h3 {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.placeholder-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    line-height: 1.5;
+}
+
+.placeholder-tech-details {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background-color: var(--primary-light);
+    color: var(--primary-hover);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    margin-top: 12px;
+}
+
+.placeholder-tech-details code {
+    font-weight: bold;
+}
+
+/* =============================================
+   ESTILOS GENERALES: BOTONES Y FORMULARIOS
+   ============================================= */
+
+/* ---- Botones ---- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition);
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+}
+
+.btn-secondary {
+    background-color: var(--primary-light);
+    color: var(--primary-hover);
+}
+
+.btn-secondary:hover {
+    background-color: #bae6fd;
+    color: var(--primary-hover);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.btn-outline:hover {
+    background-color: var(--bg);
+    border-color: var(--text-muted);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ---- Formularios ---- */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-family: var(--font-title);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.form-control {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text);
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--card-bg);
+    transition: var(--transition);
+    outline: none;
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+/* ---- Pie de Página (Footer) ---- */
+
+.site-footer {
+    background-color: var(--primary-dark);
+    color: #ffffff;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 40px 0;
+    margin-top: auto;
+}
+
+.site-footer-inner {
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px;
+}
+
+.footer-project-name {
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    color: #ffffff;
+}
+
+.footer-copyright {
+    font-size: 0.82rem;
+    color: #64748b;
+    /* Slate 500 */
+}
+
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.footer-contact p {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    /* Slate 400 */
+}
+
+.footer-contact p strong {
+    color: #f1f5f9;
+}
+
+/* ---- Animaciones ---- */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.5);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    .site-header-inner {
+        flex-direction: column;
+        height: auto;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .site-nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .site-nav a {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    .site-main {
+        margin: 20px auto;
+        gap: 24px;
+    }
+
+    .hero-section {
+        padding: 40px 24px;
+    }
+
+    .hero-title {
+        font-size: 1.85rem;
+    }
+
+    .grid-mision-vision {
+        grid-template-columns: 1fr;
+    }
+
+    .nosotros-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .seccion-institucional {
+        padding: 24px;
+    }
+
+    .module-container {
+        padding: 24px;
+    }
+
+    .placeholder-card {
+        padding: 32px 16px;
+    }
+
+    .site-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+    }
+}
+
+/* =============================================
+   MÓDULO PACIENTES - DISEÑO Y COMPONENTES
+   ============================================= */
+
+/* Layout de Rejilla para Pacientes */
+.pacientes-layout {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr;
+    gap: 32px;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .pacientes-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
+
+/* Panel de Búsqueda y Encabezado de la Tabla */
+.table-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    max-width: 320px;
+    width: 100%;
+}
+
+.search-box input {
+    padding-left: 36px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+/* Tabla Personalizada */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--card-bg);
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.custom-table th {
+    background-color: #f8fafc;
+    font-family: var(--font-title);
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.custom-table tbody tr {
+    transition: var(--transition);
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges de Estado */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.badge-active {
+    background-color: rgba(13, 148, 136, 0.1);
+    color: var(--accent);
+}
+
+.badge-inactive {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--text-muted);
+}
+
+/* Acciones en Tabla */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-xs {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    border-radius: var(--radius-sm);
+}
+
+/* Alertas Glassmorphism */
+.alert-container {
+    margin-bottom: 24px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert {
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.alert-success {
+    background-color: rgba(240, 253, 250, 0.85);
+    border-color: rgba(13, 148, 136, 0.3);
+    color: #0f766e;
+}
+
+.alert-error {
+    background-color: rgba(254, 242, 242, 0.85);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #b91c1c;
+}
+
+.alert-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Layout Vertical y Grilla de Formulario (Fila Superior) */
+.pacientes-layout-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.patient-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.patient-form-grid .form-group-full {
+    grid-column: 1 / -1;
+}
+
+.patient-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+/* Badges específicas para Estados de Citas */
+.badge-pendiente {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.badge-confirmada {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.badge-cancelada {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.badge-atendida {
+    background-color: rgba(13, 148, 136, 0.1);
+    color: var(--accent);
+}
